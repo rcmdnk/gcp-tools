@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+cmd="$1"
+st="$2"
+if [ -z "$cmd" ];then
+  echo "set cmd"
+  exit 1
+fi
+
+shift;shift
+if [ $# -ge 1 ];then
+  echo $ gcloud compute $cmd "$@"
+  gcloud compute $cmd "$@"
+fi
+
+if [ -n "$st" ];then
+  instances="$(gcloud compute instances list|grep "${st}$")"
+else
+  instances="$(gcloud compute instances list|grep -v "STATUS$")"
+fi
+
+if type sentaku >& /dev/null ;then
+  selected=$(echo "${instances}"|peco)
+elif type peco >& /dev/null ;then
+  selected=$(echo "${instances}"|sentaku -s line)
+else
+  orig_ifs=$IFS
+  IFS=$'\n'
+  instances=($(echo "$instances"))
+  IFS=$orig_ifs
+
+  select instance in "${instances[@]}";do
+    selected=$instance
+    echo
+    break
+  done
+fi
+
+if [ -z "${selected}" ];then
+  exit
+fi
+
+orig_ifs=$IFS
+IFS=$'\n'
+instances=(${selected})
+IFS=$orig_ifs
+for i in "${instances[@]}";do
+  instance=($i)
+  echo $ gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
+  gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
+done

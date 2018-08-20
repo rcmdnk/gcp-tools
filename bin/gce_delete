@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+util_path=${GCE_UTIL_PATH:-}
+if [ -n "$util_path" ];then
+  util_path="${util_path}/"
+fi
+
+gce_util "instances delete" ""
