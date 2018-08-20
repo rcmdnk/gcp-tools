@@ -19,13 +19,13 @@ else
   instances="$(gcloud compute instances list|grep -v "STATUS$")"
 fi
 
-if type sentaku >& /dev/null ;then
+if type peco >& /dev/null ;then
   selected=$(echo "${instances}"|peco)
 elif type fzy >& /dev/null ;then
   selected=$(echo "${instances}"|fzy)
 elif type fzf >& /dev/null ;then
   selected=$(echo "${instances}"|fzf)
-elif type peco >& /dev/null ;then
+elif type sentaku >& /dev/null ;then
   selected=$(echo "${instances}"|sentaku -s line)
 else
   orig_ifs=$IFS
