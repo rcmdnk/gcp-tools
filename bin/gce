@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+PREFIX="gce-"
+
+commands=()
+get_commands () {
+  local prefix="$1"
+  commands=()
+  for cmd in $(alias |grep "alias $prefix"|cut -d' ' -f2|cut -d= -f1);do
+    c=${cmd/$prefix/}
+    commands=("${commands[@]}" "$c")
+  done
+  for cmd in $(declare -f |grep "declare -f $prefix"|cut -d' ' -f3);do
+    c=${cmd/$prefix/}
+    commands=("${commands[@]}" "$c")
+  done
+  local orig_ifs=$IFS
+  IFS=":"
+  local pathes=(${PATH})
+  IFS=$orig_ifs
+
+  local p
+  local f
+  local cmd
+  for p in "${pathes[@]}";do
+    if [ ! -d "$p" ];then
+      continue
+    fi
+    while read -r f;do
+      if [ -x "$f" ];then
+        cmd="${f##*/}"
+        c=${cmd/$prefix/}
+        commands=("${commands[@]}" "$c")
+      fi
+    done < <(find  "$p" -maxdepth 1 -name  "${prefix}*")
+  done
+
+}
+
+print_commands () {
+  cat << EOF
+gce sub-commands: ${commands[@]}
+EOF
+}
+
+get_commands "$PREFIX"
+
+if [ $# -eq 0 ];then
+  print_commands
+  exit
+fi
+cmd="$1"
+shift
+if echo " ${commands[*]} "|grep -q " $cmd ";then
+  "$PREFIX$cmd" "$@"
+else
+  echo "Invalid sub command: $cmd"
+  echo
+  print_commands
+  exit 1
+fi
+
