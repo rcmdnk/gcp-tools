@@ -19,14 +19,17 @@ else
   instances="$(gcloud compute instances list|grep -v "STATUS$")"
 fi
 
-if type peco >& /dev/null ;then
-  selected=$(echo "${instances}"|peco)
-elif type fzy >& /dev/null ;then
-  selected=$(echo "${instances}"|fzy)
-elif type fzf >& /dev/null ;then
-  selected=$(echo "${instances}"|fzf)
-elif type sentaku >& /dev/null ;then
-  selected=$(echo "${instances}"|sentaku -s line)
+tool=""
+for t in $(echo ${GCE_SELECTION_TOOL:-peco,fzy,fzf,sentaku}|tr , ' ');do
+  if type "$t" >& /dev/null ;then
+    tool=$t
+  fi
+done
+if [ "$tool" = "sentaku" ];then
+  tool="sentaku -s line"
+fi
+if [ -n "$tool" ];then
+  selected=$(echo "${instances}"|$tool)
 else
   orig_ifs=$IFS
   IFS=$'\n'
