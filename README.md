@@ -10,6 +10,24 @@ Install scripts in bin/ in anywhere under $PATH.
 Install [gcloud](https://cloud.google.com/sdk/gcloud/)
 and set an account.
 
+### Usage
+
+#### Google Compute Engine Management
+
+    $ gce list              # Show compute instance list
+    $ gce ls                # Same as list
+    $ gce start  [instance] # Start insatnce
+    $ gce stop   [instance] # Stop insatnce
+    $ gce delete [instance] # Delete instance
+    $ gce rm     [instance] # Same as delete
+    $ gce ssh    [instance] # SSH to instance
+
+For start, stop, delete(rm), and ssh,
+if `instance` is not given, then a selection mode starts and 
+you can select an instance on which the command is executed.
+
+For start, stop, delete (rm), multiple instances can be selected.
+
 ### Option
 
 Tools will use following tools for the selection if installed:
