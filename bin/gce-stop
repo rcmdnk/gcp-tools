@@ -5,4 +5,4 @@ if [ -n "$util_path" ];then
   util_path="${util_path}/"
 fi
 
-gce-util "instances stop" RUNNING
+"${util_path}gce-util" "instances stop" RUNNING "$@"
