@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 2 ];then
+  echo "Usage: gce make_image <input instance name> <output image name>"
+  exit 1
+fi
+input="$1"
+output="$2"
+
+instance=($(gcloud compute instances list|grep "^$input "))
+echo ${instance[@]}
+
+if [ "${#instance[@]}" -eq 0 ];then
+  echo "$input is not available"
+  exit 1
+fi
+
+zone="${instance[1]}"
+
+echo $zone
+echo $ gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
+gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
+echo $ gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
+gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
+echo $ gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
+gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
+echo $ gcloud compute snapshots delete "$input" --zone "$zone"
+ehco y | gcloud compute snapshots delete "$input"
+echo $ gcloud compute disks delete "$output" --zone "$zone"
+echo y | gcloud compute disks delete "$output" --zone "$zone"

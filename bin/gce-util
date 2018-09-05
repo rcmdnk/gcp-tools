@@ -10,7 +10,8 @@ fi
 shift;shift
 if [ $# -ge 1 ];then
   echo $ gcloud compute $cmd "$@"
-  gcloud compute $cmd "$@"
+  gcloud compute $c
+  d "$@"
   exit $?
 fi
 
@@ -55,7 +56,7 @@ IFS=$orig_ifs
 for i in "${instances[@]}";do
   instance=($i)
   echo $ gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
-  if [ $cmd = "delete" ];then
+  if [ "$cmd" = "instances delete" ];then
     echo y|gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
   else
     gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"

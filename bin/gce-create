@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# $ gce create gcp-wn-1core-09-template --image-project centos-cloud --image-family centos-7 --boot-disk-size 50GB  --custom-cpu 1 --custom-memory $((256*12))MB --zone asia-northeast1-b
+if [ "$1" = "-h" ];then
+  gcloud compute instances create "$@"
+  echo
+  echo "Examples:"
+  echo
+  echo "$ gce create gcp-wn-1core-09-template --image-project centos-cloud --image-family centos-7 --boot-disk-size 50GB --custom-cpu 1 --custom-memory $((256*12))MB --zone asia-northeast1-b"
+  echo "# custom-memory must be 256 * X MiB"
+  echo
+  echo "$ gce create gcp-wn-1core-09-template --image-project centos-cloud --image-family centos-7 --boot-disk-size 50GB --machine-type n1-standard-1 --zone asia-northeast1-b"
+  echo "# n1-standard-1: 1core, 3.75GB, n1-standard-8: 8core, 30GB"
+  exit
+fi
+
+gcloud compute instances create "$@"
