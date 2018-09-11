@@ -10,8 +10,11 @@ fi
 shift;shift
 if [ $# -ge 1 ];then
   echo $ gcloud compute $cmd "$@"
-  gcloud compute $c
-  d "$@"
+  if [ "$cmd" = "instances delete" ];then
+    echo y|gcloud compute $cmd "$@"
+  else
+    gcloud compute $cmd "$@"
+  fi
   exit $?
 fi
 

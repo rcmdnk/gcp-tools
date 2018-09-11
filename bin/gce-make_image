@@ -8,7 +8,6 @@ input="$1"
 output="$2"
 
 instance=($(gcloud compute instances list|grep "^$input "))
-echo ${instance[@]}
 
 if [ "${#instance[@]}" -eq 0 ];then
   echo "$input is not available"
@@ -17,7 +16,6 @@ fi
 
 zone="${instance[1]}"
 
-echo $zone
 echo $ gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
 gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
 echo $ gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
