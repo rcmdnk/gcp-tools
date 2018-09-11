@@ -21,6 +21,8 @@ and set an account.
     $ gce delete [instance] # Delete instance
     $ gce rm     [instance] # Same as delete
     $ gce ssh    [instance] # SSH to instance
+    $ gce create [instance options...] # Create instance
+    $ gce make_image <input instance name> <output image name> # Make image from the instance
 
 For start, stop, delete(rm), and ssh,
 if `instance` is not given, then a selection mode starts and 
