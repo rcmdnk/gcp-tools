@@ -16,13 +16,18 @@ fi
 
 zone="${instance[1]}"
 
-echo $ gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
-gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
-echo $ gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
-gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
-echo $ gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
-gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
-echo $ gcloud compute snapshots delete "$input" --zone "$zone"
-ehco y | gcloud compute snapshots delete "$input"
-echo $ gcloud compute disks delete "$output" --zone "$zone"
-echo y | gcloud compute disks delete "$output" --zone "$zone"
+exec_cmd () {
+  cmd="$*"
+  echo "$ $cmd"
+  eval "$cmd"
+  ret=$?
+  if [ $ret -ne 0 ];then
+    echo "Failed"
+    exit $ret
+  fi
+}
+exec_cmd gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
+exec_cmd gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
+exec_cmd gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
+exec_cmd "ehco y | gcloud compute snapshots delete $input"
+exec_cmd "echo y | gcloud compute disks delete $output --zone $zone"
