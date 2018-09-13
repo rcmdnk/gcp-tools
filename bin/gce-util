@@ -2,13 +2,13 @@
 
 cmd="$1"
 st="$2"
-if [ -z "$cmd" ];then
+if [[ -z "$cmd" ]];then
   echo "set cmd"
   exit 1
 fi
 
 shift;shift
-if [ $# -ge 1 ];then
+if [[ $# -ge 1 ]];then
   echo $ gcloud compute $cmd "$@"
   if [ "$cmd" = "instances delete" ];then
     echo y|gcloud compute $cmd "$@"
@@ -30,7 +30,7 @@ for t in $(echo ${GCE_SELECTION_TOOL:-peco,fzy,fzf,sentaku}|tr , ' ');do
     tool=$t
   fi
 done
-if [ "$tool" = "sentaku" ];then
+if [[ "$tool" = "sentaku" ]];then
   tool="sentaku -s line"
 fi
 if [ -n "$tool" ];then
@@ -48,7 +48,7 @@ else
   done
 fi
 
-if [ -z "${selected}" ];then
+if [[ -z "${selected}" ]];then
   exit
 fi
 
@@ -59,7 +59,7 @@ IFS=$orig_ifs
 for i in "${instances[@]}";do
   instance=($i)
   echo $ gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
-  if [ "$cmd" = "instances delete" ];then
+  if [[ "$cmd" = *delete ]];then
     echo y|gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
   else
     gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
