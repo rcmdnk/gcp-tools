@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-./gce-delete_snapshot "$@"
+gce-delete_snapshot "$@"

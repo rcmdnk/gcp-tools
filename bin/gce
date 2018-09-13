@@ -37,26 +37,24 @@ get_commands () {
 
 }
 
-print_commands () {
-  cat << EOF
-gce sub-commands: ${commands[@]}
-EOF
-}
-
 get_commands "$PREFIX"
 
 if [ $# -eq 0 ];then
-  print_commands
+  echo "gce sub-commands: ${commands[*]}"
   exit
 fi
 cmd="$1"
 shift
-if echo " ${commands[*]} "|grep -q " $cmd ";then
+if [[ "$cmd" = "commands" ]];then
+  echo "${commands[*]}"
+  exit
+fi
+if [[ " ${commands[*]} " == *\ $cmd\ * ]];then
   "$PREFIX$cmd" "$@"
 else
   echo "Invalid sub command: $cmd"
   echo
-  print_commands
+  echo "gce sub-commands: ${commands[*]}"
   exit 1
 fi
 

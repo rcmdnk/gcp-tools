@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-./gce-delete_image "$@"
+gce-delete_image "$@"

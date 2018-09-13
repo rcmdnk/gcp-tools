@@ -29,5 +29,5 @@ exec_cmd () {
 exec_cmd gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
 exec_cmd gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
 exec_cmd gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
-exec_cmd "ehco y | gcloud compute snapshots delete $input"
+exec_cmd "echo y | gcloud compute snapshots delete $input"
 exec_cmd "echo y | gcloud compute disks delete $output --zone $zone"

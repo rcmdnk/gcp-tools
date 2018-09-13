@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 
 cmd="$1"
-st="$2"
 if [[ -z "$cmd" ]];then
   echo "set cmd"
   exit 1
+fi
+st="$2"
+category=${cmd% *}
+if [[ $category = ssh ]];then
+  category=instances
 fi
 
 shift;shift
 if [[ $# -ge 1 ]];then
   echo $ gcloud compute $cmd "$@"
-  if [ "$cmd" = "instances delete" ];then
+  if [[ "$cmd" = *delete ]];then
     echo y|gcloud compute $cmd "$@"
   else
     gcloud compute $cmd "$@"
@@ -18,10 +22,15 @@ if [[ $# -ge 1 ]];then
   exit $?
 fi
 
-if [ -n "$st" ];then
-  instances="$(gcloud compute instances list|grep "${st}$")"
+targets="$(gcloud compute $category list)"
+if [[ -n "$st" ]];then
+  targets="$(echo "$targets"|grep "${st}$")"
 else
-  instances="$(gcloud compute instances list|grep -v "STATUS$")"
+  if [[ "$category" = "images" ]];then
+    targets="$(echo "$targets"|grep $(gcloud config get-value project))"
+  else
+    targets="$(echo "$targets"|grep -v "STATUS$")"
+  fi
 fi
 
 tool=""
@@ -34,15 +43,15 @@ if [[ "$tool" = "sentaku" ]];then
   tool="sentaku -s line"
 fi
 if [ -n "$tool" ];then
-  selected=$(echo "${instances}"|$tool)
+  selected=$(echo "${targets}"|$tool)
 else
   orig_ifs=$IFS
   IFS=$'\n'
-  instances=($(echo "$instances"))
+  targets=($(echo "$targets"))
   IFS=$orig_ifs
 
-  select instance in "${instances[@]}";do
-    selected=$instance
+  select target in "${targets[@]}";do
+    selected=$target
     echo
     break
   done
@@ -54,14 +63,18 @@ fi
 
 orig_ifs=$IFS
 IFS=$'\n'
-instances=(${selected})
+targets=(${selected})
 IFS=$orig_ifs
-for i in "${instances[@]}";do
-  instance=($i)
-  echo $ gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
+for i in "${targets[@]}";do
+  target=($i)
+  options=""
+  if [[ $category = "instances" ]];then
+    options="$options --zone ${target[1]}"
+  fi
+  echo $ gcloud compute $cmd "${target[0]}" $options
   if [[ "$cmd" = *delete ]];then
-    echo y|gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
+    echo y|gcloud compute $cmd "${target[0]}" $options
   else
-    gcloud compute $cmd "${instance[0]}" --zone "${instance[1]}"
+    gcloud compute $cmd "${target[0]}" $options
   fi
 done
