@@ -5,4 +5,4 @@ if [ -n "$util_path" ];then
   util_path="${util_path}/"
 fi
 
-"${util_path}gce-util" ssh RUNNING "$@"
+"${util_path}gce-util" scp RUNNING "${opt[@]}"
