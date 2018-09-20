@@ -4,12 +4,5 @@ util_path=${GCE_UTIL_PATH:-}
 if [ -n "$util_path" ];then
   util_path="${util_path}/"
 fi
-opt=()
-for o in "$@";do
-  if [ "$o" = "-r" ];then
-    o="--recurse"
-  fi
-  opt=("${opt[@]}" "$o")
-done
 
 "${util_path}gce-util" ssh RUNNING "$@"
