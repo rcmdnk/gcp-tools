@@ -7,7 +7,7 @@ if [[ -z "$cmd" ]];then
 fi
 st="$2"
 category=${cmd% *}
-if [[ $category = ssh ]] || [[ $category = scp ]];then
+if [[ $category = ssh ]] || [[ $category = scp ]] || [[ $category = mosh ]];then
   category=instances
 fi
 
@@ -71,10 +71,11 @@ for i in "${targets[@]}";do
   if [[ $category = "instances" ]];then
     options="$options --zone ${target[1]}"
   fi
-  echo $ gcloud compute $cmd "${target[0]}" $options
+  name=${target[0]}
+  echo $ gcloud compute $cmd $name $options
   if [[ "$cmd" = *delete ]];then
-    echo y|gcloud compute $cmd "${target[0]}" $options
+    echo y|gcloud compute $cmd $name $options
   else
-    gcloud compute $cmd "${target[0]}" $options
+    gcloud compute $cmd $name $options
   fi
 done

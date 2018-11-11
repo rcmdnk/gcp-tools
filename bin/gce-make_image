@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
 if [ $# -lt 2 ];then
-  echo "Usage: gce make_image <input instance name> <output image name>"
+  echo "Usage: gce make_image <input instance name> <output image name> [is_delete_input (1 to delete)]"
   exit 1
 fi
 input="$1"
 output="$2"
+delete="${3:-0}"
 
 instance=($(gcloud compute instances list|grep "^$input "))
 
@@ -31,3 +32,6 @@ exec_cmd gcloud compute disks create "$output" --source-snapshot "$input" --zone
 exec_cmd gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
 exec_cmd "echo y | gcloud compute snapshots delete $input"
 exec_cmd "echo y | gcloud compute disks delete $output --zone $zone"
+if [ "$delete" -eq 1 ];then
+  exec_cmd "echo y | gcloud compute instance delete $input"
+fi
