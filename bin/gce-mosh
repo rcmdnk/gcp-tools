@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+instance=""
+opt="ssh"
+while [[ $# -gt 0 ]];do
+  if [[ "$1" = "-i" ]];then
+    opt="$opt -i $2"
+    shift
+  elif [[ "$1" = "-l" ]];then
+    opt="$opt -l $2"
+    shift
+  else
+    instance=$1
+  fi
+  shift
+done
+targets="$(gcloud compute instances list|grep "RUNNING")"
+if [[ -n "$instance" ]];then
+  selected="$(echo "$targets"|grep "$instance")"
+else
+  tool=""
+  for t in $(echo ${GCE_SELECTION_TOOL:-peco,fzy,fzf,sentaku}|tr , ' ');do
+    if type "$t" >& /dev/null ;then
+      tool=$t
+    fi
+  done
+  if [[ "$tool" = "sentaku" ]];then
+    tool="sentaku -s line"
+  fi
+  if [ -n "$tool" ];then
+    selected=$(echo "${targets}"|$tool)
+  else
+    orig_ifs=$IFS
+    IFS=$'\n'
+    targets=($(echo "$targets"))
+    IFS=$orig_ifs
+
+    select target in "${targets[@]}";do
+      selected=$target
+      echo
+      break
+    done
+  fi
+fi
+
+if [[ -z "${selected}" ]];then
+  exit
+fi
+
+target=(${selected})
+name=${target[$((${#target[@]}-2))]}
+echo $ mosh --ssh="$opt" $name
+mosh --ssh="$opt" $name
+exit $?
