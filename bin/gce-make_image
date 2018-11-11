@@ -33,5 +33,5 @@ exec_cmd gcloud compute images create "$output" --source-disk "$output" --source
 exec_cmd "echo y | gcloud compute snapshots delete $input"
 exec_cmd "echo y | gcloud compute disks delete $output --zone $zone"
 if [ "$delete" -eq 1 ];then
-  exec_cmd "echo y | gcloud compute instance delete $input"
+  exec_cmd "echo y | gcloud compute instances delete $input"
 fi
