@@ -4,5 +4,11 @@ util_path=${GCE_UTIL_PATH:-}
 if [ -n "$util_path" ];then
   util_path="${util_path}/"
 fi
+echo $#
+if [ $# -gt 1 ];then
+  opt=("$1" "--command" "${@:2}")
+else
+  opt=("$@")
+fi
 
-"${util_path}gce-util" ssh RUNNING "$@"
+"${util_path}gce-util" ssh RUNNING "${opt[@]}"
