@@ -5,7 +5,7 @@ if [ -n "$util_path" ];then
   util_path="${util_path}/"
 fi
 if [ $# -gt 1 ];then
-  opt=("$1" "--command" "${@:2}")
+  opt=("$1" "--command" "${*:2}")
 else
   opt=("$@")
 fi
