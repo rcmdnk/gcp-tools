@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-HELP="Usage: gce make_image [-fdh] <input instance name> <output image name>
+HELP="Usage: gce make_snapshot [-fd] <input instance name> <output snapshot name>
 
-  -f   Force to create new image (delete if it already exists)
-  -d   Delete input instance after creating image
-  -h   Show this help
+  -f   Force to create new snapshot (delete if it already exists)
+  -d   Delete input instance after creating snapshot
 "
 
 force=0
@@ -15,7 +14,6 @@ while [ $# -gt 0 ];do
   case $1 in
     -f)force=1;;
     -d)delete=1;;
-    -h)echo "$HELP";exit;;
     *)
       if [ -z "$input" ];then
         input=$1
@@ -37,7 +35,7 @@ fi
 
 instance=($(gcloud compute instances list|grep "^$input "))
 
-if [ -z "$input" ] || [ -z "$output" ] || [ "${#instance[@]}" -eq 0 ];then
+if [ "${#instance[@]}" -eq 0 ];then
   echo "$input is not available"
   exit 1
 fi
@@ -56,15 +54,9 @@ exec_cmd () {
 }
 
 if [ $force -eq 1 ];then
-  echo y|gcloud compute snapshots delete "$input" >&/dev/null
-  echo y|gcloud compute disks delete $output --zone $zone >&/dev/null
-  echo y|gcloud compute images delete "$output" >&/dev/null
+  echo y|gcloud compute snapshots delete "$output" >&/dev/null
 fi
 exec_cmd gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
-exec_cmd gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
-exec_cmd gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
-exec_cmd "echo y|gcloud compute snapshots delete $input"
-exec_cmd "echo y|gcloud compute disks delete $output --zone $zone"
 if [ "$delete" -eq 1 ];then
   exec_cmd "echo y|gcloud compute instances delete $input"
 fi
