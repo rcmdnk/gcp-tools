@@ -58,11 +58,14 @@ if [ $force -eq 1 ];then
   echo y|gcloud compute disks delete $output --zone $zone >&/dev/null
   echo y|gcloud compute images delete "$output" >&/dev/null
 fi
-exec_cmd gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
-exec_cmd gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
-exec_cmd gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
-exec_cmd "echo y|gcloud compute snapshots delete $input"
-exec_cmd "echo y|gcloud compute disks delete $output --zone $zone"
-if [ "$delete" -eq 1 ];then
-  exec_cmd "echo y|gcloud compute instances delete $input"
+if [ "$delete" -eq 0 ];then
+  exec_cmd gcloud compute disks snapshot "$input" --snapshot-names "$input" --zone "$zone"
+  exec_cmd gcloud compute disks create "$output" --source-snapshot "$input" --zone "$zone"
+  exec_cmd gcloud compute images create "$output" --source-disk "$output" --source-disk-zone "$zone"
+  exec_cmd "echo y|gcloud compute snapshots delete $input"
+  exec_cmd "echo y|gcloud compute disks delete $output --zone $zone"
+else
+  exec_cmd gcloud compute instances delete "$input" --keep-disks boot
+  exec_cmd gcloud compute images create "$output" --source-disk "$input" --source-disk-zone "$zone"
+  exec_cmd "echo y|gcloud compute disks delete $input --zone $zone"
 fi
