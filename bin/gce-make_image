@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-HELP="Usage: gce make_image [-fd] <input instance name> <output image name>
+HELP="Usage: gce make_image [-fdh] <input instance name> <output image name>
 
   -f   Force to create new image (delete if it already exists)
   -d   Delete input instance after creating image
+  -h   Show this help
 "
 
 force=0
@@ -14,6 +15,7 @@ while [ $# -gt 0 ];do
   case $1 in
     -f)force=1;;
     -d)delete=1;;
+    -h)echo "$HELP";exit;;
     *)
       if [ -z "$input" ];then
         input=$1
@@ -35,7 +37,7 @@ fi
 
 instance=($(gcloud compute instances list|grep "^$input "))
 
-if [ "${#instance[@]}" -eq 0 ];then
+if [ -z "$input" ] || [ -z "$output" ] || [ "${#instance[@]}" -eq 0 ];then
   echo "$input is not available"
   exit 1
 fi
