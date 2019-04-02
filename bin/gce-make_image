@@ -67,7 +67,7 @@ if [ "$delete" -eq 0 ];then
   exec_cmd "echo y|gcloud compute snapshots delete $input"
   exec_cmd "echo y|gcloud compute disks delete $output --zone $zone"
 else
-  exec_cmd gcloud compute instances delete "$input" --keep-disks boot
+  exec_cmd "echo y|gcloud compute instances delete $input --keep-disks boot"
   exec_cmd gcloud compute images create "$output" --source-disk "$input" --source-disk-zone "$zone"
   exec_cmd "echo y|gcloud compute disks delete $input --zone $zone"
 fi
